@@ -1,9 +1,9 @@
-import { createMuiTheme } from "@material-ui/core";
+import { createTheme } from "@material-ui/core";
 
 const primary = "#18E1D9";
 const secondary = "#0B0B15";
 
-export default createMuiTheme({
+const theme = createTheme({
   typography: {
     fontFamily: "Poppins, sans-serif",
   },
@@ -47,3 +47,5 @@ export default createMuiTheme({
     },
   },
 });
+
+export default theme;
