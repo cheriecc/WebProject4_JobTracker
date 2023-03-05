@@ -1,6 +1,7 @@
 import React from "react";
-import { Box } from "@material-ui/core";
+import { Box, ThemeProvider } from "@material-ui/core";
+import theme from "./theme/theme";
 
 export default () => {
-  return <Box>Desi Codes</Box>;
+  return <ThemeProvider theme={theme}></ThemeProvider>;
 };
