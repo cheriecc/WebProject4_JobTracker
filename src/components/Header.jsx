@@ -6,7 +6,7 @@ export default props => (
         <Grid container justifyContent="center">
             <Grid item xs={10}>
                 <Box display="flex" justifyContent="space-between">
-                    <Typography variant="h4">Track Job Application</Typography>
+                    <Typography variant="h4">Track My Job Applications</Typography>
                     <Button variant="contained" color="primary" disableElevation>Post a job</Button>
                 </Box>
             </Grid>

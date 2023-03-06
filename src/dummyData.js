@@ -9,6 +9,7 @@ export default [
     companyUrl: "Google.com",
     skills: ["Javascript", "React.js", "Node.js"],
     link: "https://google.com/careers",
+    deadline: "2023-3-1",
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export default [
     companyUrl: "Yahoo.com",
     skills: ["Angular", "Node.js"],
     link: "https://yahoo.com/jobs",
+    deadline: "2023-3-2",
   },
   {
     id: 3,
@@ -31,5 +33,6 @@ export default [
     companyUrl: "https://facebook.com",
     skills: ["flutter"],
     link: "https://facebook.com/careers",
+    deadline: "2023-3-2",
   },
 ];
