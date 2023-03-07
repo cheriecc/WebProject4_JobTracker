@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Grid, FilledInput, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton } from "@material-ui/core";
+import React, { useState } from "react";
+import { Box, Grid, FilledInput, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
 import {Close as CloseIcon} from "@material-ui/icons"
 
 const useStyles = makeStyles((theme) => ({
@@ -19,21 +19,76 @@ const useStyles = makeStyles((theme) => ({
             color: "#fff",
         },
     },
+    included: {
+        backgroundColor: theme.palette.secondary.main,
+        color: "#fff",
+
+    },
 }));
+
+const initState = {
+    title: "",
+    deadline: "",
+    type: "Full time",
+    companyName: "",
+    location: "Remote",
+    link: "",
+    description: "",
+    skills: [],
+}
 
 export default (props) => {
 
-    const classes = useStyles();
+    const [loading, setLoading] = useState(false);
+    const [jobDetails, setJobDetails] = useState(initState);
 
-    const skills = ["JavaScript", "Node.js", "React", "Node", "Vue", "MongoDB", "SQL"];
+    const handleChange = e => {
+        e.persist();
+        setJobDetails(oldState => ({...oldState, [e.target.name]: e.target.value}));
+    };
+    const addRemoveSkill = skill => {
+        jobDetails.skills.includes(skill)
+        // Remove the skill
+         ? setJobDetails(oldState => ({
+            ...oldState, skills: oldState.skills.filter((s) => s !== skill),
+        }))
+        // Add the skill
+         : setJobDetails(oldState => ({
+            ...oldState, skills: oldState.skills.concat(skill)
+        }));
+    };
+    const handleSubmit = async () => {
+        setLoading(true);
+        await props.postJob(jobDetails);
+        closeModel();
+
+        // To check if any blank
+        // for (const field in jobDetails) {
+        //     if (typeof jobDetails[field] == "string" && !jobDetails[field])
+        //     return console.log("not validated.")
+        // }
+        // if (!jobDetails.skills.length) return console.log("not validated")
+        // return console.log("Validated.")
+
+    };
+    const closeModel = () => {
+        setJobDetails(initState);
+        setLoading(false);
+        props.closeModel();
+    };
+
+    const classes = useStyles();
+    const skills = ["JavaScript","Python", "Java", "Flask", "Django", "Node.js", "React", "Node", "Vue", "MongoDB", "SQL"];
+
+    // console.log(jobDetails);
 
     return (
-        <Dialog open={false} fullWidth>
+        <Dialog open={props.newJobModel} fullWidth>
 
             <DialogTitle>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                     New position
-                    <IconButton> <CloseIcon /> </IconButton>
+                    <IconButton onClick={closeModel}> <CloseIcon /> </IconButton>
                 </Box>
             </DialogTitle>
 
@@ -42,11 +97,11 @@ export default (props) => {
                 <Grid container spacing={2}>
 
                     <Grid item xs={6}>
-                        <FilledInput placeholder="Job Title *" disableUnderline fullWidth></FilledInput>
+                        <FilledInput onChange={handleChange} name="title" value={jobDetails.title} autoComplete="off" placeholder="Job Title *" disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Select fullWidth disableUnderline variant="filled" defaultValue="Full time">
+                        <Select onChange={handleChange} name="type" value={jobDetails.type} fullWidth disableUnderline variant="filled">
                             <MenuItem value="Full time">Full time</MenuItem>
                             <MenuItem value="Part time">Part time</MenuItem>
                             <MenuItem value="Contract">Contract</MenuItem>
@@ -54,35 +109,34 @@ export default (props) => {
                     </Grid>
 
                     <Grid item xs={6}>
-                        <FilledInput placeholder="Company Name *" disableUnderline fullWidth></FilledInput>
+                        <FilledInput onChange={handleChange} name="companyName" value={jobDetails.companyName} autoComplete="off" placeholder="Company Name *" disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={6}>
-                        <FilledInput placeholder="Company URL *" disableUnderline fullWidth></FilledInput>
-                    </Grid>
-
-                    <Grid item xs={6}>
-                        <Select fullWidth disableUnderline variant="filled" defaultValue="Job location">
-                            <MenuItem value="Job location">Job location</MenuItem>
+                        <Select onChange={handleChange} name="location" value={jobDetails.location} fullWidth disableUnderline variant="filled">
                             <MenuItem value="Remote">Remote</MenuItem>
                             <MenuItem value="On site">On site</MenuItem>
                         </Select>
                     </Grid>
 
                     <Grid item xs={6}>
-                        <FilledInput placeholder="Job Link *" disableUnderline fullWidth></FilledInput>
+                        <FilledInput onChange={handleChange} name="link" value={jobDetails.link} autoComplete="off" placeholder="Job Link *" disableUnderline fullWidth />
+                    </Grid>
+
+                    <Grid item xs={6}>
+                        <FilledInput onChange={handleChange} name="deadline" value={jobDetails.deadline} autoComplete="off" placeholder="Deadline *" disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={12}>
-                        <FilledInput placeholder="Job description *" disableUnderline fullWidth multiline rows={4} />
+                        <FilledInput onChange={handleChange} name="description" value={jobDetails.description} autoComplete="off" placeholder="Job description *" disableUnderline fullWidth multiline rows={4} />
                     </Grid>
                 </Grid>
 
                 <Box mt={2}>
-                    <Typography>Skills</Typography>
-                    <Box display="flex">
+                    <Typography>Skill Set</Typography>
+                    <Box display="flex" flexWrap="wrap">
                         {skills.map((skill) => (
-                            <Box className={classes.skillChip} key={skill}>{skill}</Box>
+                            <Box onClick={() => addRemoveSkill(skill)} className={`${classes.skillChip} ${jobDetails.skills.includes(skill) && classes.included}`} key={skill}>{skill}</Box>
                         ))}
                     </Box>
                 </Box>
@@ -92,11 +146,12 @@ export default (props) => {
             <DialogActions>
                 <Box color="red" width="100%" display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="caption">* Required field</Typography>
-                    <Button variant="contained" disableElevation color="primary">Post job</Button>
+                    <Button onClick={handleSubmit} variant="contained" disableElevation color="primary" disable={loading.toString()}>
+                        {loading ? (<CircularProgress color="secondary" size={22}/>) : ("Post job")}
+                    </Button>
                 </Box>
             </DialogActions>
 
         </Dialog>
     )
 }
-
