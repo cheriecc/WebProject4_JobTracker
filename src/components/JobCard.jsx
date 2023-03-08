@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Grid, Typography, Button, makeStyles } from "@material-ui/core"
+import { format } from "date-fns";
 
 const useStyles = makeStyles((theme) => ({
     wrapper: {
@@ -55,11 +56,11 @@ export default (props) => {
                 <Grid item>
                 {/* differenceInCalendarDays(Date.now(), props.deadline.) */}
                 {/* props.deadline.toLocaleDateString() */}
-                    <Typography variant="caption">{props.deadline.toLocaleDateString("es-CL")} | {`${props.type}`} | {`${props.location}`}</Typography>
+                    <Typography variant="caption">{format(props.deadline, "MMM-dd-yyyy")} | {`${props.type}`} | {`${props.location}`}</Typography>
                 </Grid>
                 <Grid item>
                     <Box mt={2}>
-                        <Button variant="outlined">Detail</Button>
+                        <Button onClick={props.open} variant="outlined">Detail</Button>
                     </Box>
                 </Grid>
             </Grid>

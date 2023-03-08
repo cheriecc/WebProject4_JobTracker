@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Grid, FilledInput, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
-import {Close as CloseIcon} from "@material-ui/icons"
+import { Close as CloseIcon} from "@material-ui/icons"
 
 const useStyles = makeStyles((theme) => ({
     skillChip: {
@@ -146,7 +146,7 @@ export default (props) => {
             <DialogActions>
                 <Box color="red" width="100%" display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="caption">* Required field</Typography>
-                    <Button onClick={handleSubmit} variant="contained" disableElevation color="primary" disable={loading.toString()}>
+                    <Button onClick={handleSubmit} variant="contained" disableElevation color="primary" disabled={loading}>
                         {loading ? (<CircularProgress color="secondary" size={22}/>) : ("Post job")}
                     </Button>
                 </Box>

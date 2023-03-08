@@ -1,21 +1,34 @@
 import React, {useEffect, useState} from "react";
-import { Box, CircularProgress, Grid, ThemeProvider } from "@material-ui/core";
+import { Box, Button, CircularProgress, Grid, ThemeProvider } from "@material-ui/core";
+import { Close as CloseIcon } from "@material-ui/icons";
 import theme from "./theme/theme";
 import Header from "./components/Header";
 import SearchBar from "./components/SearchBar";
 import JobCard from "./components/JobCard";
 import NewJobModel from "./components/NewJobModel";
+import ViewJob from "./components/ViewJob";
 import { firestore, app } from "./firebase/config";
 
 export default () => {
 
   const [jobs, setJobs] = useState([]);
-  const [newJobModel, setNewJobModel] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [customSearch, setCustomSearch] = useState(false);
+  const [newJobModel, setNewJobModel] = useState(false);
+  const [displayJob, setDisplayJob] = useState([]);
 
   const fetchJobs = async () => {
     setLoading(true);
+    setCustomSearch(false);
     const req = await firestore.collection('jobs').get();
+    const tempJobs = req.docs.map((job) => ({ ...job.data(), id: job.id, deadline: job.data().deadline.toDate(),}));
+    setJobs(tempJobs);
+    setLoading(false);
+  };
+  const fetchJobsCustoms = async (jobSearch) => {
+    setLoading(true);
+    setCustomSearch(true);
+    const req = await firestore.collection('jobs').where("type", "==", jobSearch.type).where("location", "==", jobSearch.location).get();
     const tempJobs = req.docs.map((job) => ({ ...job.data(), id: job.id, deadline: job.data().deadline.toDate(),}));
     setJobs(tempJobs);
     setLoading(false);
@@ -34,15 +47,24 @@ export default () => {
   return <ThemeProvider theme={theme}>
     <Header openNewJobModel={() => setNewJobModel(true)} />
     <NewJobModel closeModel={() => setNewJobModel(false)} postJob={postJob} newJobModel={newJobModel} />
+    <ViewJob job={displayJob} closeDisplay = {() => {setDisplayJob([])}}/>
     
     <Box>
       <Grid container justifyContent="center">
         <Grid item xs={10}>
-          <SearchBar />
+          <SearchBar fetchJobsCustoms={fetchJobsCustoms} />
+
           {loading ? (
             <Box display="flex" justifyContent="center"><CircularProgress /></Box>
           ) : (
-            jobs.map((job) => (<JobCard key={job.id} {...job} />))
+            <>
+            {customSearch && (
+            <Box my={2} display="flex" justifyContent="flex-end">
+              <Button onClick={fetchJobs}><CloseIcon size={20}/> Custom search</Button>
+            </Box>
+            )}
+            {jobs.map((job) => (<JobCard open={() => setDisplayJob(job)} key={job.id} {...job} />))}
+            </>
           )}
         </Grid>
       </Grid>
