@@ -1,6 +1,6 @@
 // V9
 // import { initializeApp } from 'firebase/app';
-// import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+// import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 // V8
 // import firebase from 'firebase/app';

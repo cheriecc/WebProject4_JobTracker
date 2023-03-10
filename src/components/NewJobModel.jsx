@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Box, Grid, FilledInput, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
 import { Close as CloseIcon} from "@material-ui/icons"
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers'
+import DateFnsUtils from '@date-io/date-fns'
 
 const useStyles = makeStyles((theme) => ({
     skillChip: {
@@ -24,11 +26,14 @@ const useStyles = makeStyles((theme) => ({
         color: "#fff",
 
     },
+    dateSelector: {
+        margin: "0px 0px 20px 0px",
+    },
 }));
 
 const initState = {
     title: "",
-    deadline: "",
+    deadline: new Date(),
     type: "Full time",
     companyName: "",
     location: "Remote",
@@ -45,6 +50,9 @@ export default (props) => {
     const handleChange = e => {
         e.persist();
         setJobDetails(oldState => ({...oldState, [e.target.name]: e.target.value}));
+    };
+    const handleDateChange = date => {
+        setJobDetails(oldState => ({...oldState, deadline: date}));
     };
     const addRemoveSkill = skill => {
         jobDetails.skills.includes(skill)
@@ -80,7 +88,7 @@ export default (props) => {
     const classes = useStyles();
     const skills = ["JavaScript","Python", "Java", "Flask", "Django", "Node.js", "React", "Node", "Vue", "MongoDB", "SQL"];
 
-    // console.log(jobDetails);
+    console.log(jobDetails);
 
     return (
         <Dialog open={props.newJobModel} fullWidth>
@@ -123,13 +131,18 @@ export default (props) => {
                         <FilledInput onChange={handleChange} name="link" value={jobDetails.link} autoComplete="off" placeholder="Job Link *" disableUnderline fullWidth />
                     </Grid>
 
-                    <Grid item xs={6}>
-                        <FilledInput onChange={handleChange} name="deadline" value={jobDetails.deadline} autoComplete="off" placeholder="Deadline *" disableUnderline fullWidth />
+                    <Grid item xs={6} container justifyContent="center" alignItems="center">
+                        <MuiPickersUtilsProvider utils={DateFnsUtils} fullWidth>
+                            <Grid>
+                                <KeyboardDatePicker onChange={handleDateChange} name="deadline" disableToolbar variant="inline" format="MM-dd-yyyy" label="Deadline *" value={jobDetails.deadline} KeyboardButtonProps={{'aria-label': 'change date',}} />
+                            </Grid>
+                        </MuiPickersUtilsProvider>
                     </Grid>
 
                     <Grid item xs={12}>
                         <FilledInput onChange={handleChange} name="description" value={jobDetails.description} autoComplete="off" placeholder="Job description *" disableUnderline fullWidth multiline rows={4} />
                     </Grid>
+
                 </Grid>
 
                 <Box mt={2}>

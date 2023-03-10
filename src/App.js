@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, CircularProgress, Grid, ThemeProvider } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons";
 import theme from "./theme/theme";
@@ -7,7 +7,19 @@ import SearchBar from "./components/SearchBar";
 import JobCard from "./components/JobCard";
 import NewJobModel from "./components/NewJobModel";
 import ViewJob from "./components/ViewJob";
-import { firestore, app } from "./firebase/config";
+import { firestore } from "./firebase/config";
+import UpdateJob from "./components/UpdateJob";
+
+const initState = {
+  title: "",
+  deadline: "",
+  type: "Full time",
+  companyName: "",
+  location: "Remote",
+  link: "",
+  description: "",
+  skills: [],
+};
 
 export default () => {
 
@@ -15,7 +27,8 @@ export default () => {
   const [loading, setLoading] = useState(true);
   const [customSearch, setCustomSearch] = useState(false);
   const [newJobModel, setNewJobModel] = useState(false);
-  const [displayJob, setDisplayJob] = useState([]);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [displayJob, setDisplayJob] = useState(initState);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -34,11 +47,37 @@ export default () => {
     setLoading(false);
   };
   const postJob = async jobDetails => {
-    await firestore.collection("jobs").add({
-      ...jobDetails, deadline: app.firestore.FieldValue.serverTimestamp()
-    });
+    await firestore.collection("jobs").add(jobDetails);
     fetchJobs();
+  };
+  const deleteJob = async (id) => {
+    setLoading(true);
+    try {
+      const toDelete = firestore.collection('jobs').doc(id);
+      await toDelete.delete();
+      console.log('Document successfully deleted');
+      setDisplayJob(initState);
+      fetchJobs();
+    } catch (error) {
+    console.error('error removing document');
+    }
+  };
+  const onUpdate = () => {
+    setIsUpdate(true);
   }
+  const updateJob = async (updateJobDetails) => {
+    setLoading(true);
+    try{
+      const toUpdate = firestore.collection('jobs').doc(updateJobDetails.id);
+      await toUpdate.update(updateJobDetails);
+      console.log('Document successfully updated');
+      setDisplayJob(initState);
+      fetchJobs();
+    } catch (error) {
+      console.log(updateJobDetails);
+      console.log('error updating document', error);
+    }
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -47,8 +86,8 @@ export default () => {
   return <ThemeProvider theme={theme}>
     <Header openNewJobModel={() => setNewJobModel(true)} />
     <NewJobModel closeModel={() => setNewJobModel(false)} postJob={postJob} newJobModel={newJobModel} />
-    <ViewJob job={displayJob} closeDisplay = {() => {setDisplayJob([])}}/>
-    
+    <ViewJob job={displayJob} id={displayJob.id} onDelete={() => {deleteJob(displayJob.id)}} onUpdate={() => onUpdate()} closeDisplay = {() => {setDisplayJob(initState)}}/>
+    <UpdateJob open={isUpdate} job={isUpdate ? displayJob : initState} updateJob={updateJob} closeUpdate={() => {setIsUpdate(false)}}/>
     <Box>
       <Grid container justifyContent="center">
         <Grid item xs={10}>

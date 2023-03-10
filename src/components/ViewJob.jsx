@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, Grid, FilledInput, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
+import React, {useState} from "react";
+import { Box, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
 import { Close as CloseIcon } from "@material-ui/icons"
 import { format } from "date-fns";
 
@@ -23,13 +23,20 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 
-
 export default (props) => {
+
+    const [loading, setLoading] = useState(false);
 
     const classes = useStyles();
 
+    const handleDelete = async () => {
+        setLoading(true);
+        await props.onDelete(props.id);
+        setLoading(false);
+    };
+
     return (
-    <Dialog open={props.job.length === 0 ? false : true} fullWidth>
+    <Dialog open={props.job.title === "" ? false : true} fullWidth>
         <DialogTitle>
             <Box display="flex" justifyContent="space-between" alignItems="center">
                 {props.job.title}
@@ -71,8 +78,10 @@ export default (props) => {
             </Box>
         </DialogContent>
         <DialogActions>
-            <Button variant="outlined">Update</Button>
-            <Button variant="outlined">Delete</Button>
+            <Button onClick={props.onUpdate} variant="outlined">Update</Button>
+            <Button onClick={handleDelete} disableElevation variant="outlined" disabled={loading}>
+            {loading ? (<CircularProgress color="secondary" size={22}/>) : "Delete"}
+            </Button>
         </DialogActions>
     </Dialog>
     )
