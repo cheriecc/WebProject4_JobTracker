@@ -1,6 +1,8 @@
 import React, { useState }from "react";
 import { Box, Grid, Select, MenuItem, FilledInput, Dialog, DialogTitle, DialogContent, DialogActions, Typography, makeStyles, Button, IconButton, CircularProgress } from "@material-ui/core";
-import { Close as CloseIcon } from "@material-ui/icons"
+import { Close as CloseIcon } from "@material-ui/icons";
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import DateFnsUtils from '@date-io/date-fns';
 
 const useStyles = makeStyles((theme) => ({
     skillChip: {
@@ -28,13 +30,25 @@ const useStyles = makeStyles((theme) => ({
 export default (props) => {
 
     const [loading, setLoading] = useState(false);
-    const [updateJobDetails, setUpdateJobDetails] = useState(props.job);
+    const [updateJobDetails, setUpdateJobDetails] = useState([]);
+
+    // const setOpen = () => {
+    //     props.setOpen();
+    //     setUpdateJobDetails(() => {
+    //         for (const field in props.job) {
+    //             updateJobDetails[field] = props.job[field]
+    //         }
+    //     });
+    //     return true;
+    // }
 
     const handleChange = e => {
         e.persist();
         setUpdateJobDetails(prevJob => ({...prevJob,[e.target.name]: e.target.value}));
     };
-
+    const handleDateChange = date => {
+        setUpdateJobDetails(oldState => ({...oldState, deadline: date}));
+    };
     const addRemoveSkill = skill => {
         updateJobDetails.skills.includes(skill)
         // Remove the skill
@@ -46,11 +60,7 @@ export default (props) => {
             ...oldState, skills: oldState.skills.concat(skill)
         }));
     };
-    const handleUpdate = async () => {
-        setLoading(true);
-        await props.updateJob(updateJobDetails);
-        closeUpdate();
-    };
+
     const closeUpdate = () => {
         setLoading(false);
         props.closeUpdate();
@@ -58,6 +68,10 @@ export default (props) => {
 
     const classes = useStyles();
     const skills = ["JavaScript","Python", "Java", "Flask", "Django", "Node.js", "React", "Node", "Vue", "MongoDB", "SQL"];
+
+    console.log("Update Job");
+    console.log(props.job);
+    console.log(props.job.deadline);
 
     return (
         <Dialog open={props.open} fullWidth>
@@ -73,38 +87,41 @@ export default (props) => {
                 <Grid container spacing={2}>
 
                     <Grid item xs={6}>
-                        <FilledInput onChange={handleChange} name="title" autoComplete="off" defaultValue={props.job.title} disableUnderline fullWidth />
+                        <FilledInput onChange={handleChange} name="title" autoComplete="off" defaultValue={props.job.title} value={updateJobDetails.title} disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Select onChange={handleChange} name="type" defaultValue={props.job.type} fullWidth disableUnderline variant="filled">
+                        <Select onChange={handleChange} name="type" displayEmpty value={props.job.type} fullWidth disableUnderline variant="filled">
                             <MenuItem value="Full time">Full time</MenuItem>
                             <MenuItem value="Part time">Part time</MenuItem>
                             <MenuItem value="Contract">Contract</MenuItem>
                         </Select>
                     </Grid>
-
                     <Grid item xs={6}>
-                        <FilledInput onChange={handleChange} name="companyName" autoComplete="off" defaultValue={props.job.companyName} disableUnderline fullWidth />
+                        <FilledInput onChange={handleChange} name="companyName" autoComplete="off" defaultValue={props.job.companyName} value={updateJobDetails.companyName} disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={6}>
-                        <Select onChange={handleChange} name="location" defaultValue={props.job.location} fullWidth disableUnderline variant="filled">
+                        <Select onChange={handleChange} name="location" displayEmpty value={props.job.location} fullWidth disableUnderline variant="filled">
                             <MenuItem value="Remote">Remote</MenuItem>
                             <MenuItem value="On site">On site</MenuItem>
                         </Select>
                     </Grid>
 
                     <Grid item xs={6}>
-                        <FilledInput onChange={handleChange} name="link" autoComplete="off" defaultValue={props.job.link} disableUnderline fullWidth />
+                        <FilledInput onChange={handleChange} name="link" autoComplete="off" defaultValue={props.job.link} value={updateJobDetails.link} disableUnderline fullWidth />
                     </Grid>
 
                     <Grid item xs={6}>
-                        <FilledInput onChange={handleChange} name="deadline" autoComplete="off" disableUnderline fullWidth />
+                    <MuiPickersUtilsProvider utils={DateFnsUtils} fullWidth>
+                            <Grid>
+                                <KeyboardDatePicker onChange={handleDateChange} name="deadline" disableToolbar variant="filled" format="MM-dd-yyyy" label="Deadline *" value={props.job.deadline} />
+                            </Grid>
+                        </MuiPickersUtilsProvider>
                     </Grid>
 
                     <Grid item xs={12}>
-                        <FilledInput onChange={handleChange} name="description" autoComplete="off" defaultValue={props.job.description} disableUnderline fullWidth multiline rows={4} />
+                        <FilledInput onChange={handleChange} name="description" autoComplete="off" defaultValue={props.job.description} value={updateJobDetails.description} disableUnderline fullWidth multiline rows={4} />
                     </Grid>
                 </Grid>
 
@@ -122,7 +139,18 @@ export default (props) => {
             <DialogActions>
                 <Box color="red" width="100%" display="flex" justifyContent="space-between" alignItems="center">
                     <Typography variant="caption">* Required field</Typography>
-                    <Button onClick={handleUpdate} variant="contained" disableElevation color="primary" disabled={loading}>
+                    <Button 
+                    onClick={async (e) => {
+                        e.preventDefault();
+                        console.log("clicked update");
+                        for (const field in updateJobDetails) {
+                            console.log(updateJobDetails[field]);
+                        };
+                        console.log(updateJobDetails);
+                        await props.updateThisJob(props.id, updateJobDetails);
+                        closeUpdate();
+                    }}
+                    variant="contained" disableElevation color="primary" disabled={loading}>
                         {loading ? (<CircularProgress color="secondary" size={22}/>) : ("Update job")}
                     </Button>
                 </Box>

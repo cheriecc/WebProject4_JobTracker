@@ -88,7 +88,7 @@ export default (props) => {
     const classes = useStyles();
     const skills = ["JavaScript","Python", "Java", "Flask", "Django", "Node.js", "React", "Node", "Vue", "MongoDB", "SQL"];
 
-    console.log(jobDetails);
+    // console.log(jobDetails);
 
     return (
         <Dialog open={props.newJobModel} fullWidth>

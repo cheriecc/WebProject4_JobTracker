@@ -8,11 +8,10 @@ import JobCard from "./components/JobCard";
 import NewJobModel from "./components/NewJobModel";
 import ViewJob from "./components/ViewJob";
 import { firestore } from "./firebase/config";
-import UpdateJob from "./components/UpdateJob";
 
 const initState = {
   title: "",
-  deadline: "",
+  deadline: new Date(),
   type: "Full time",
   companyName: "",
   location: "Remote",
@@ -27,7 +26,6 @@ export default () => {
   const [loading, setLoading] = useState(true);
   const [customSearch, setCustomSearch] = useState(false);
   const [newJobModel, setNewJobModel] = useState(false);
-  const [isUpdate, setIsUpdate] = useState(false);
   const [displayJob, setDisplayJob] = useState(initState);
 
   const fetchJobs = async () => {
@@ -62,19 +60,20 @@ export default () => {
     console.error('error removing document');
     }
   };
-  const onUpdate = () => {
-    setIsUpdate(true);
-  }
-  const updateJob = async (updateJobDetails) => {
-    setLoading(true);
+  const onUpdate = async (id, newJob) => {
+    // console.log(id);
+    // for (const field in newJob) {
+    //   console.log(newJob[field]);
+    // }
+    setDisplayJob()
     try{
-      const toUpdate = firestore.collection('jobs').doc(updateJobDetails.id);
-      await toUpdate.update(updateJobDetails);
+      const toUpdate = firestore.collection('jobs').doc(id);
+      await toUpdate.update(newJob);
       console.log('Document successfully updated');
       setDisplayJob(initState);
       fetchJobs();
     } catch (error) {
-      console.log(updateJobDetails);
+      console.log(newJob);
       console.log('error updating document', error);
     }
   };
@@ -86,8 +85,7 @@ export default () => {
   return <ThemeProvider theme={theme}>
     <Header openNewJobModel={() => setNewJobModel(true)} />
     <NewJobModel closeModel={() => setNewJobModel(false)} postJob={postJob} newJobModel={newJobModel} />
-    <ViewJob job={displayJob} id={displayJob.id} onDelete={() => {deleteJob(displayJob.id)}} onUpdate={() => onUpdate()} closeDisplay = {() => {setDisplayJob(initState)}}/>
-    <UpdateJob open={isUpdate} job={isUpdate ? displayJob : initState} updateJob={updateJob} closeUpdate={() => {setIsUpdate(false)}}/>
+    <ViewJob job={displayJob} id={displayJob.id} onDelete={() => {deleteJob(displayJob.id)}} onUpdate={onUpdate} closeDisplay = {() => {setDisplayJob(initState)}}/>
     <Box>
       <Grid container justifyContent="center">
         <Grid item xs={10}>
@@ -102,7 +100,7 @@ export default () => {
               <Button onClick={fetchJobs}><CloseIcon size={20}/> Custom search</Button>
             </Box>
             )}
-            {jobs.map((job) => (<JobCard open={() => setDisplayJob(job)} key={job.id} {...job} />))}
+            {jobs.map((job) => (<JobCard open={() => {setDisplayJob(job)}} key={job.id} {...job} />))}
             </>
           )}
         </Grid>
