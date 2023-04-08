@@ -5,6 +5,7 @@
 ## Deployed on
 
 - Render: https://jobapplicationtracker-e5pz.onrender.com
+- Netlify: https://master--glowing-cascaron-ea3cd6.netlify.app/
 
 
 ## Built With
