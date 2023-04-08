@@ -5,7 +5,6 @@
 ## Deployed on
 
 - Render: https://jobapplicationtracker-e5pz.onrender.com
-- Microsoft Azure: https://blue-ground-04d759b03.2.azurestaticapps.net/
 
 
 ## Built With
