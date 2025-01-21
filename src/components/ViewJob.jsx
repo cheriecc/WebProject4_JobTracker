@@ -38,8 +38,8 @@ export default (props) => {
         setLoading(false);
     };
 
-    console.log("View Jobs");
-    console.log(props.job);
+    // console.log("View Jobs");
+    // console.log(props.job);
 
     return (
         <Box>
@@ -86,7 +86,7 @@ export default (props) => {
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => {setIsUpdate(true)}} variant="outlined">Update</Button>
-                <Button onClick={handleDelete} disableElevation variant="outlined" disabled={loading}>
+                <Button onClick={() => handleDelete()} disableElevation variant="outlined" disabled={loading}>
                 {loading ? (<CircularProgress color="secondary" size={22}/>) : "Delete"}
                 </Button>
             </DialogActions>

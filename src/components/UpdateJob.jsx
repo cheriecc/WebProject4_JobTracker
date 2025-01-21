@@ -29,8 +29,21 @@ const useStyles = makeStyles((theme) => ({
 
 export default (props) => {
 
+    const initJobDetails = {
+        title: props.job ? props.job.title : "",
+        deadline: props.job ? props.job.deadline: new Date(),
+        type: props.job ? props.job.type : "Full time",
+        companyName: props.job ? props.job.companyName : "",
+        location: props.job ? props.job.location : "Remote",
+        link: props.job ? props.job.link : "",
+        description: props.job ? props.job.description : "",
+        skills: props.job ? props.job.skills : [],
+    }
+
+
     const [loading, setLoading] = useState(false);
     const [updateJobDetails, setUpdateJobDetails] = useState([]);
+//    const [updateJobDetails, setUpdateJobDetails] = useState(initJobDetails);
 
     // const setOpen = () => {
     //     props.setOpen();
@@ -51,11 +64,11 @@ export default (props) => {
     };
     const addRemoveSkill = skill => {
         updateJobDetails.skills.includes(skill)
-        // Remove the skill
+        // uncheck the skill
          ? setUpdateJobDetails(oldState => ({
             ...oldState, skills: oldState.skills.filter((s) => s !== skill),
         }))
-        // Add the skill
+        // check the skill
          : setUpdateJobDetails(oldState => ({
             ...oldState, skills: oldState.skills.concat(skill)
         }));

@@ -7,7 +7,9 @@ import SearchBar from "./components/SearchBar";
 import JobCard from "./components/JobCard";
 import NewJobModel from "./components/NewJobModel";
 import ViewJob from "./components/ViewJob";
-import { firestore } from "./firebase/config";
+import { db } from "./firebase/config";
+import {  collection, query, doc, getDocs, addDoc, updateDoc, deleteDoc } from "firebase/firestore/lite";
+
 
 const initState = {
   title: "",
@@ -31,7 +33,7 @@ export default () => {
   const fetchJobs = async () => {
     setLoading(true);
     setCustomSearch(false);
-    const req = await firestore.collection('jobs').get();
+    const req = await getDocs(collection(db, 'jobs'));
     const tempJobs = req.docs.map((job) => ({ ...job.data(), id: job.id, deadline: job.data().deadline.toDate(),}));
     setJobs(tempJobs);
     setLoading(false);
@@ -39,19 +41,19 @@ export default () => {
   const fetchJobsCustoms = async (jobSearch) => {
     setLoading(true);
     setCustomSearch(true);
-    const req = await firestore.collection('jobs').where("type", "==", jobSearch.type).where("location", "==", jobSearch.location).get();
+    const req = await query(collection(db, 'jobs')).where("type", "==", jobSearch.type).where("location", "==", jobSearch.location).get();
     const tempJobs = req.docs.map((job) => ({ ...job.data(), id: job.id, deadline: job.data().deadline.toDate(),}));
     setJobs(tempJobs);
     setLoading(false);
   };
   const postJob = async jobDetails => {
-    await firestore.collection("jobs").add(jobDetails);
+    await addDoc(collection(db, "jobs"), jobDetails);
     fetchJobs();
   };
   const deleteJob = async (id) => {
     setLoading(true);
     try {
-      const toDelete = firestore.collection('jobs').doc(id);
+      const toDelete = deleteDoc(doc(db, 'jobs', id));
       await toDelete.delete();
       console.log('Document successfully deleted');
       setDisplayJob(initState);
@@ -67,9 +69,7 @@ export default () => {
     // }
     setDisplayJob()
     try{
-      const toUpdate = firestore.collection('jobs').doc(id);
-      await toUpdate.update(newJob);
-      console.log('Document successfully updated');
+      await updateDoc(doc(db, 'jobs', id), newJob);
       setDisplayJob(initState);
       fetchJobs();
     } catch (error) {
@@ -85,7 +85,7 @@ export default () => {
   return <ThemeProvider theme={theme}>
     <Header openNewJobModel={() => setNewJobModel(true)} />
     <NewJobModel closeModel={() => setNewJobModel(false)} postJob={postJob} newJobModel={newJobModel} />
-    <ViewJob job={displayJob} id={displayJob.id} onDelete={() => {deleteJob(displayJob.id)}} onUpdate={onUpdate} closeDisplay = {() => {setDisplayJob(initState)}}/>
+    <ViewJob job={displayJob} id={displayJob.id} onDelete={() => {deleteJob(displayJob.id)}} onUpdate={() => onUpdate()} closeDisplay = {() => {setDisplayJob(initState)}}/>
     <Box>
       <Grid container justifyContent="center">
         <Grid item xs={10}>

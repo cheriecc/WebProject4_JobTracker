@@ -1,38 +1,47 @@
-// V9
-// import { initializeApp } from 'firebase/app';
-// import { getFirestore, collection, getDocs } from 'firebase/firestore';
+// V10
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore/lite';
 
 // V8
 // import firebase from 'firebase/app';
 // import 'firebase/firestore'
 
 // V7
-import app from "firebase/app";
-import "firebase/firestore";
-
+// import app from "firebase/app";
+// import "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCb7Pff2KDT5YHOzsNKh52FLIonFtGA3f8",
-    authDomain: "jobtracker-16e40.firebaseapp.com",
-    projectId: "jobtracker-16e40",
-    storageBucket: "jobtracker-16e40.appspot.com",
-    messagingSenderId: "820586352159",
-    appId: "1:820586352159:web:a43933d840c07037f50f2a"
-  };
+  apiKey: "AIzaSyCb7Pff2KDT5YHOzsNKh52FLIonFtGA3f8",
+  authDomain: "jobtracker-16e40.firebaseapp.com",
+  projectId: "jobtracker-16e40",
+  storageBucket: "jobtracker-16e40.appspot.com",
+  messagingSenderId: "820586352159",
+  appId: "1:820586352159:web:a43933d840c07037f50f2a"
+};
 
-// V9
-// const app = initializeApp(firebaseConfig);
-// const firestore = getFirestore(app);
+// V10
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// const getData = async () => {
+
+//   const jobsData = await getDocs(collection(db, 'jobs'));
+//   const jobsList = jobsData.docs.map((job) => job.data());
+//   return jobsList;
+// }
+
+// console.log('GetData')
+// console.log(getData())
 
 // V8
 // firebase.initializeApp(firebaseConfig);
 // const firestore = firebase.firestore();
 
 // V7
-const firebase = app.initializeApp(firebaseConfig);
-const firestore = firebase.firestore();
+// const firebase = app.initializeApp(firebaseConfig);
+// const firestore = firebase.firestore();
 
-export { firebase, firestore, app };
+export { db };
 
 
 /*
